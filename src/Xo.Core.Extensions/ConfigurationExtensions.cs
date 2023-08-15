@@ -3,22 +3,18 @@
 public static class ConfigurationExtensions
 {
     public static IConfiguration AddConfigurations(this IServiceCollection @this,
-        in IEnumerable<string>? configurations = null
+        in IEnumerable<string>? configurations = null,
+        bool ignoreAppSettings = false
     )
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            .SetBasePath(Directory.GetCurrentDirectory());
 
-        if (configurations is null)
-        {
-            return @this.AddConfiguration(configurationBuilder.Build());
-        }
+        if (ignoreAppSettings is false) configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-        foreach (var config in configurations)
-        {
-            configurationBuilder.AddJsonFile(config, optional: false, reloadOnChange: true);
-        }
+        if (configurations is null) return @this.AddConfiguration(configurationBuilder.Build());
+
+        foreach (var config in configurations) configurationBuilder.AddJsonFile(config, optional: false, reloadOnChange: true);
 
         return @this.AddConfiguration(configurationBuilder.Build());
     }
